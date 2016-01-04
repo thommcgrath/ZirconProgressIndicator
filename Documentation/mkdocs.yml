@@ -1,0 +1,6 @@
+site_name: ZirconProgressIndicator
+pages:
+- Home: 'index.md'
+- Version History: 'History.md'
+theme: mkdocs
+include_next_prev: false
