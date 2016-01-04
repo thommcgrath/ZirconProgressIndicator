@@ -84,6 +84,10 @@ Inherits ArtisanKit.Control
 		  #Pragma Unused Areas
 		  #Pragma Unused Highlighted
 		  
+		  If Not Self.Registered Then
+		    Return
+		  End If
+		  
 		  Dim Surface As New Picture(Self.Width * ScalingFactor, Self.Height * ScalingFactor)
 		  Dim Radius As Double = Min(Surface.Width, Surface.Height) / 2
 		  Dim CenterX As Double = Surface.Width / 2
@@ -210,6 +214,16 @@ Inherits ArtisanKit.Control
 	#tag Method, Flags = &h21
 		Private Shared Function DegreesToRadians(Degrees As Double) As Double
 		  Return Degrees * 0.01745329252
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Attributes( Hidden ) Private Function Registered() As Boolean
+		  #if DebugBuild
+		    Return True
+		  #else
+		    Return False // Invoice: XXXXXXXXXXXXXXXXXXX
+		  #endif
 		End Function
 	#tag EndMethod
 
