@@ -121,11 +121,14 @@ Begin Window Window1
       AcceptTabs      =   False
       Animated        =   True
       AutoDeactivate  =   True
-      BackColor       =   &cFFFFFFFF
+      BackColor       =   &cCCCCCC00
       Backdrop        =   0
       CanCancel       =   True
+      DoubleBuffer    =   False
       Enabled         =   True
+      EraseBackground =   False
       ForeColor       =   &c4A91D500
+      HasFocus        =   False
       Height          =   150
       HelpTag         =   ""
       Indeterminate   =   False
@@ -139,6 +142,7 @@ Begin Window Window1
       LockTop         =   True
       Maximum         =   100.0
       Minimum         =   0.0
+      Progress        =   0.0
       Scope           =   0
       ScrollSpeed     =   20
       TabIndex        =   4

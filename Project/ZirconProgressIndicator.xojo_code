@@ -31,6 +31,16 @@ Inherits ArtisanKit.Control
 		    If Finished Then
 		      Self.StartAnimation("spinner", 0, 360, Self.AnimationDuration * 3, False)
 		    End If
+		  Case "angle-major"
+		    Self.mMajorAngle = Value
+		    If Finished And Self.Indeterminate Then
+		      Self.StartAnimation("angle-major", -60, 300, Self.AnimationDuration * 3, False)
+		    End If
+		  Case "angle-minor"
+		    Self.mMinorAngle = Value
+		    If Finished And Self.Indeterminate Then
+		      Self.StartAnimation("angle-minor", -120, 240, Self.AnimationDuration * 3, False)
+		    End If
 		  Else
 		    Return
 		  End Select
@@ -94,81 +104,111 @@ Inherits ArtisanKit.Control
 		  Dim CenterY As Double = Surface.Height / 2
 		  Dim Rect As New REALbasic.Rect(Round(CenterX - Radius), Round(CenterY - Radius), Round(Radius * 2), Round(Radius * 2))
 		  Dim InsideRect As New REALbasic.Rect(Round(CenterX - (Radius / 2)), Round(CenterY - (Radius / 2)), Round(Radius), Round(Radius))
+		  Dim Distance As Double
 		  
 		  Surface.Graphics.ForeColor = Self.BackColor
 		  Surface.Graphics.FillRect(0, 0, Surface.Width, Surface.Height)
+		  
 		  Surface.Graphics.ForeColor = Self.ForeColor
 		  
-		  If Self.Indeterminate Then
-		    Dim DegreesLow As Double = Self.mIndeterminateAngle - 30
-		    Dim Degrees As Double = Self.mIndeterminateAngle
-		    Dim DegreesHigh As Double = Self.mIndeterminateAngle + 30
-		    Dim Distance As Double = Radius * 1.5
-		    Dim RadsLow As Double = Self.DegreesToRadians(DegreesLow)
-		    Dim Rads As Double = Self.DegreesToRadians(Degrees)
-		    Dim RadsHigh As Double = Self.DegreesToRadians(DegreesHigh)
-		    Dim Leg1X As Double = CenterX + (Distance * Cos(RadsLow))
-		    Dim Leg1Y As Double = CenterY + (Distance * Sin(RadsLow))
-		    Dim Leg2X As Double = CenterX + (Distance * Cos(Rads))
-		    Dim Leg2Y As Double = CenterY + (Distance * Sin(Rads))
-		    Dim Leg3X As Double = CenterX + (Distance * Cos(RadsHigh))
-		    Dim Leg3Y As Double = CenterY + (Distance * Sin(RadsHigh))
-		    
-		    Dim Points(8) As Integer
-		    Points(1) = Round(Leg1X)
-		    Points(2) = Round(Leg1Y)
-		    Points(3) = Round(Leg2X)
-		    Points(4) = Round(Leg2Y)
-		    Points(5) = Round(Leg3X)
-		    Points(6) = Round(Leg3Y)
-		    Points(7) = Round(CenterX)
-		    Points(8) = Round(CenterY)
-		    
-		    Surface.Graphics.FillPolygon(Points)
-		  Else
-		    Dim Degrees As Double = 360 * ((Self.mAnimatedValue - Self.mAnimatedMinimum) / (Self.mAnimatedMaximum - Self.mAnimatedMinimum))
-		    Dim StartAngle As Double
-		    If Degrees >= 90 Then
-		      Surface.Graphics.FillRect(Round(CenterX), Rect.Top, Round(Rect.Width / 2), Round(Rect.Height / 2))
-		    ElseIf Degrees > 0 Then
-		      StartAngle = 270
-		    End If
-		    If Degrees >= 180 Then
-		      Surface.Graphics.FillRect(Round(CenterX), Round(CenterY), Round(Rect.Width / 2), Round(Rect.Height / 2))
-		    ElseIf Degrees > 90 Then
-		      StartAngle = 0
-		    End If
-		    If Degrees >= 270 Then
-		      Surface.Graphics.FillRect(Rect.Left, Round(CenterY), Round(Rect.Width / 2), Round(Rect.Height / 2))
-		    ElseIf Degrees > 180 Then
-		      StartAngle = 90
-		    End If
-		    If Degrees >= 360 Then
-		      Surface.Graphics.FillRect(Rect.Left, Rect.Top, Round(Rect.Width / 2), Round(Rect.Height / 2))
-		    ElseIf Degrees > 270 Then
-		      StartAngle = 180
-		    End If
-		    
-		    If Degrees > 0 And Degrees < 360 Then
-		      Dim Distance As Double = Radius * 1.5
-		      Dim Angle1Radians As Double = Self.DegreesToRadians(Degrees - 90)
-		      Dim Angle2Radians As Double = Self.DegreesToRadians(StartAngle)
-		      Dim Leg1X As Double = CenterX + (Distance * Cos(Angle1Radians))
-		      Dim Leg1Y As Double = CenterY + (Distance * Sin(Angle1Radians))
-		      Dim Leg2X As Double = CenterX + (Distance * Cos(Angle2Radians))
-		      Dim Leg2Y As Double = CenterY + (Distance * Sin(Angle2Radians))
-		      
-		      Dim Points(6) As Integer
-		      Points(1) = Round(Leg1X)
-		      Points(2) = Round(Leg1Y)
-		      Points(3) = Round(Leg2X)
-		      Points(4) = Round(Leg2Y)
-		      Points(5) = Round(CenterX)
-		      Points(6) = Round(CenterY)
-		      
-		      Surface.Graphics.FillPolygon(Points)
-		    End If
-		  End If
+		  ' If Self.mMinorAngle = -90 And Self.mMajorAngle = 270 Then
+		  ' Surface.Graphics.FillRect(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
+		  ' Else
+		  Dim Angles(0) As Double
+		  Angles(0) = Self.mMinorAngle
+		  For Angle As Double = Self.mMinorAngle + 45 To Self.mMajorAngle - 1 Step 45
+		    Angles.Append(Angle)
+		  Next
+		  Angles.Append(Self.mMajorAngle)
+		  
+		  Distance = Radius * 1.5
+		  Dim Points(2) As Integer
+		  Points(1) = Round(CenterX)
+		  Points(2) = Round(CenterY)
+		  For Each Angle As Double In Angles
+		    While Angle >= 270
+		      Angle = Angle - 360
+		    Wend
+		    Dim Rads As Double = Self.DegreesToRadians(Angle)
+		    Dim LegX As Double = CenterX + (Distance * Cos(Rads))
+		    Dim LegY As Double = CenterY + (Distance * Sin(Rads))
+		    Points.Append(Round(LegX))
+		    Points.Append(Round(LegY))
+		  Next
+		  
+		  Surface.Graphics.FillPolygon(Points)
+		  ' End If
+		  
+		  ' If Self.Indeterminate Then
+		  ' Dim DegreesLow As Double = Self.mIndeterminateAngle - 30
+		  ' Dim Degrees As Double = Self.mIndeterminateAngle
+		  ' Dim DegreesHigh As Double = Self.mIndeterminateAngle + 30
+		  ' Dim Distance As Double = Radius * 1.5
+		  ' Dim RadsLow As Double = Self.DegreesToRadians(DegreesLow)
+		  ' Dim Rads As Double = Self.DegreesToRadians(Degrees)
+		  ' Dim RadsHigh As Double = Self.DegreesToRadians(DegreesHigh)
+		  ' Dim Leg1X As Double = CenterX + (Distance * Cos(RadsLow))
+		  ' Dim Leg1Y As Double = CenterY + (Distance * Sin(RadsLow))
+		  ' Dim Leg2X As Double = CenterX + (Distance * Cos(Rads))
+		  ' Dim Leg2Y As Double = CenterY + (Distance * Sin(Rads))
+		  ' Dim Leg3X As Double = CenterX + (Distance * Cos(RadsHigh))
+		  ' Dim Leg3Y As Double = CenterY + (Distance * Sin(RadsHigh))
+		  ' 
+		  ' Dim Points(8) As Integer
+		  ' Points(1) = Round(Leg1X)
+		  ' Points(2) = Round(Leg1Y)
+		  ' Points(3) = Round(Leg2X)
+		  ' Points(4) = Round(Leg2Y)
+		  ' Points(5) = Round(Leg3X)
+		  ' Points(6) = Round(Leg3Y)
+		  ' Points(7) = Round(CenterX)
+		  ' Points(8) = Round(CenterY)
+		  ' 
+		  ' Surface.Graphics.FillPolygon(Points)
+		  ' Else
+		  ' Dim Degrees As Double = 360 * ((Self.mAnimatedValue - Self.mAnimatedMinimum) / (Self.mAnimatedMaximum - Self.mAnimatedMinimum))
+		  ' Dim StartAngle As Double
+		  ' If Degrees >= 90 Then
+		  ' Surface.Graphics.FillRect(Round(CenterX), Rect.Top, Round(Rect.Width / 2), Round(Rect.Height / 2))
+		  ' ElseIf Degrees > 0 Then
+		  ' StartAngle = 270
+		  ' End If
+		  ' If Degrees >= 180 Then
+		  ' Surface.Graphics.FillRect(Round(CenterX), Round(CenterY), Round(Rect.Width / 2), Round(Rect.Height / 2))
+		  ' ElseIf Degrees > 90 Then
+		  ' StartAngle = 0
+		  ' End If
+		  ' If Degrees >= 270 Then
+		  ' Surface.Graphics.FillRect(Rect.Left, Round(CenterY), Round(Rect.Width / 2), Round(Rect.Height / 2))
+		  ' ElseIf Degrees > 180 Then
+		  ' StartAngle = 90
+		  ' End If
+		  ' If Degrees >= 360 Then
+		  ' Surface.Graphics.FillRect(Rect.Left, Rect.Top, Round(Rect.Width / 2), Round(Rect.Height / 2))
+		  ' ElseIf Degrees > 270 Then
+		  ' StartAngle = 180
+		  ' End If
+		  ' 
+		  ' If Degrees > 0 And Degrees < 360 Then
+		  ' Dim Distance As Double = Radius * 1.5
+		  ' Dim Angle1Radians As Double = Self.DegreesToRadians(Degrees - 90)
+		  ' Dim Angle2Radians As Double = Self.DegreesToRadians(StartAngle)
+		  ' Dim Leg1X As Double = CenterX + (Distance * Cos(Angle1Radians))
+		  ' Dim Leg1Y As Double = CenterY + (Distance * Sin(Angle1Radians))
+		  ' Dim Leg2X As Double = CenterX + (Distance * Cos(Angle2Radians))
+		  ' Dim Leg2Y As Double = CenterY + (Distance * Sin(Angle2Radians))
+		  ' 
+		  ' Dim Points(6) As Integer
+		  ' Points(1) = Round(Leg1X)
+		  ' Points(2) = Round(Leg1Y)
+		  ' Points(3) = Round(Leg2X)
+		  ' Points(4) = Round(Leg2Y)
+		  ' Points(5) = Round(CenterX)
+		  ' Points(6) = Round(CenterY)
+		  ' 
+		  ' Surface.Graphics.FillPolygon(Points)
+		  ' End If
+		  ' End If
 		  
 		  Dim Mask As New Picture(Surface.Width, Surface.Height, 32)
 		  Mask.Graphics.DrawPicture(Surface.CopyMask, 0, 0)
@@ -183,8 +223,14 @@ Inherits ArtisanKit.Control
 		  Temp.Graphics.DrawPicture(Mask, 0, 0)
 		  Surface.ApplyMask(Temp)
 		  
+		  Surface.Graphics.ForeColor = &c000000E4
+		  Surface.Graphics.PenWidth = 2 * ScalingFactor
+		  Surface.Graphics.PenHeight = Surface.Graphics.PenWidth
+		  Surface.Graphics.DrawOval(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
+		  Surface.Graphics.DrawOval(InsideRect.Left - Surface.Graphics.PenWidth, InsideRect.Top - Surface.Graphics.PenWidth, InsideRect.Width + (Surface.Graphics.PenWidth * 2), InsideRect.Height + (Surface.Graphics.PenWidth * 2))
+		  
 		  If Self.CanCancel Then
-		    Dim Distance As Double = Radius / 2.5
+		    Distance = Radius / 2.5
 		    Dim LeftEdge As Double = CenterX + (Distance * Cos(3.92699))
 		    Dim TopEdge As Double = CenterY + (Distance * Sin(3.92699))
 		    Dim RightEdge As Double = CenterX + (Distance * Cos(0.785398))
@@ -200,7 +246,7 @@ Inherits ArtisanKit.Control
 		    Surface.Graphics.FillRect(CancelRect.Left, CancelRect.Top, CancelRect.Width, CancelRect.Height)
 		  End If
 		  
-		  G.DrawPicture(Surface, 0, 0, G.Width, G.Height, 0, 0, Temp.Width, Temp.Height)
+		  G.DrawPicture(Surface, 0, 0, G.Width, G.Height, 0, 0, Surface.Width, Surface.Height)
 		End Sub
 	#tag EndEvent
 
@@ -212,9 +258,30 @@ Inherits ArtisanKit.Control
 
 
 	#tag Method, Flags = &h21
+		Private Function AngleForProgress(Progress As Double) As Double
+		  Dim Degrees As Double = 360 * Max(Min(Progress, 1), 0)
+		  Return Degrees - 90
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Shared Function DegreesToRadians(Degrees As Double) As Double
 		  Return Degrees * 0.01745329252
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub FilterAngle(ByRef Angle As Double, Major As Boolean)
+		  If Major Then
+		    While Angle > 270
+		      Angle = Angle - 360
+		    Wend
+		  Else
+		    While Angle >= 270
+		      Angle = Angle - 360
+		    Wend
+		  End If
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -225,6 +292,24 @@ Inherits ArtisanKit.Control
 		    Return False // Invoice: XXXXXXXXXXXXXXXXXXX
 		  #endif
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub SetAngles(MinorAngle As Double, MajorAngle As Double, AnimationMultiplier As Double, Ease As Boolean, Animated As Boolean)
+		  While MinorAngle < Self.mMinorAngle Or MinorAngle < Self.mMajorAngle Or MajorAngle < Self.mMinorAngle Or MajorAngle < Self.mMajorAngle
+		    MinorAngle = MinorAngle + 360
+		    MajorAngle = MajorAngle + 360
+		  Wend
+		  
+		  If Self.Animated Or Animated Then
+		    Self.StartAnimation("angle-minor", Self.mMinorAngle, MinorAngle, Self.AnimationDuration * AnimationMultiplier, Ease)
+		    Self.StartAnimation("angle-major", Self.mMajorAngle, MajorAngle, Self.AnimationDuration * AnimationMultiplier, Ease)
+		  Else
+		    Self.mMinorAngle = MinorAngle
+		    Self.mMajorAngle = MajorAngle
+		    Self.Invalidate
+		  End If
+		End Sub
 	#tag EndMethod
 
 
@@ -335,7 +420,9 @@ Inherits ArtisanKit.Control
 			  If Self.mIndeterminate <> Value Then
 			    Self.mIndeterminate = Value
 			    If Value Then
-			      Self.StartAnimation("spinner", 0, 360, Self.AnimationDuration * 3, False)
+			      Self.SetAngles(-120, -60, 2, False, True)
+			    Else
+			      Self.SetAngles(-90, Self.AngleForProgress(Self.Progress), 2, False, True)
 			    End If
 			    Self.Invalidate
 			  End If
@@ -441,6 +528,14 @@ Inherits ArtisanKit.Control
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
+		Private mMajorAngle As Double = -90
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mMinorAngle As Double = -90
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
 		Attributes( Hidden ) Private mTargetMaximum As Double
 	#tag EndProperty
 
@@ -449,11 +544,11 @@ Inherits ArtisanKit.Control
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mTargetValue As Double
+		Attributes( Hidden ) Private mTransparency As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mTransparency As Double
+		Attributes( Hidden ) Private mValue As Double
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -473,22 +568,28 @@ Inherits ArtisanKit.Control
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  Return Max(Min(Self.mTargetValue, Self.mTargetMaximum), Self.mTargetMinimum)
+			  Return Max(Min(Self.mValue, Self.mTargetMaximum), Self.mTargetMinimum)
 			End Get
 		#tag EndGetter
 		#tag Setter
 			Set
-			  If Value = Self.mTargetValue Then
+			  Self.mValue = Value
+			  Dim Angle As Double = Self.AngleForProgress(Self.Progress)
+			  Self.FilterAngle(Angle, True)
+			  If Angle = Self.mMajorAngle Or Self.Indeterminate Then
 			    Return
 			  End If
 			  
-			  Self.mTargetValue = Value
+			  Self.mMinorAngle = -90
+			  While Self.mMajorAngle > 270
+			    Self.mMajorAngle = Self.mMajorAngle - 360
+			  Wend
 			  If Self.Animated Then
-			    Self.StartAnimation("value", Self.mAnimatedValue, Value, Self.AnimationDuration)
+			    Self.StartAnimation("angle-major", Self.mMajorAngle, Angle, Self.AnimationDuration)
 			  Else
-			    Self.mAnimatedValue = Value
-			    Self.Invalidate
+			    Self.mMajorAngle = Angle
 			  End If
+			  Self.Invalidate
 			End Set
 		#tag EndSetter
 		Value As Double
