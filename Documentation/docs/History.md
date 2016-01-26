@@ -7,6 +7,7 @@
 - Added a border to the indicator.
 - When animation is enabled, the indicator will smoothly transition in and out of the indeterminate state.
 - Updated included Artisan Kit module to version 1.0.2.
+- Added version number to class. This can be found using the Version As String method or checking the Version attribute.
 
 ## Version 1.0 - January 3rd, 2016
 

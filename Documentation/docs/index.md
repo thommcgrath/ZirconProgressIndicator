@@ -47,3 +47,8 @@ Percentage of the job complete. Values < 0 or > 1 are adjusted to fit in range.
 
 <pre id="property.value"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;">Value <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span> = <span style="color: #336698;">50</span></span></pre>
 The numeric value of the job completion. Values outside the range of the minimum / maximum are automatically brought into range. You may use either the `Progress` property or `Value` property, depending on preference.
+
+## Methods
+
+<pre id="method.version"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;"><span style="color: #0000FF;">Function</span> Version() <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">String</span></span></pre>
+Returns the version number of the class. Can also be found in the class attributes.
