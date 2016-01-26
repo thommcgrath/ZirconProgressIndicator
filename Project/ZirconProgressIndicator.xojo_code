@@ -1,5 +1,5 @@
 #tag Class
-Protected Class ZirconProgressIndicator
+ Attributes ( Version = "1.1" ) Protected Class ZirconProgressIndicator
 Inherits ArtisanKit.Control
 	#tag Event
 		Sub AnimationStep(Key As String, Value As Double, Finished As Boolean)
@@ -185,26 +185,26 @@ Inherits ArtisanKit.Control
 
 
 	#tag Method, Flags = &h21
-		Private Function AngleForProgress(Progress As Double) As Double
+		Attributes( Hidden ) Private Function AngleForProgress(Progress As Double) As Double
 		  Dim Degrees As Double = 360 * Max(Min(Progress, 1), 0)
 		  Return Degrees - 90
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateDuration(FromAngle As Double, ToAngle As Double) As Double
+		Attributes( Hidden ) Private Function CalculateDuration(FromAngle As Double, ToAngle As Double) As Double
 		  Return Self.RevolutionTime * (Abs(ToAngle - FromAngle) / 360)
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Function DegreesToRadians(Degrees As Double) As Double
+		Attributes( Hidden ) Private Shared Function DegreesToRadians(Degrees As Double) As Double
 		  Return Degrees * 0.01745329252
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function IsAnimated() As Boolean
+		Attributes( Hidden ) Private Function IsAnimated() As Boolean
 		  Return Self.Animated And Self.mReady
 		End Function
 	#tag EndMethod
@@ -220,7 +220,7 @@ Inherits ArtisanKit.Control
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub SetAngles(MinorAngle As Double, MajorAngle As Double, AnimationMultiplier As Double, Ease As Boolean, Animated As Boolean)
+		Attributes( Hidden ) Private Sub SetAngles(MinorAngle As Double, MajorAngle As Double, AnimationMultiplier As Double, Ease As Boolean, Animated As Boolean)
 		  While MinorAngle < Self.mMinorAngle Or MinorAngle < Self.mMajorAngle Or MajorAngle < Self.mMinorAngle Or MajorAngle < Self.mMajorAngle
 		    Self.mMinorAngle = Self.mMinorAngle - 360
 		    Self.mMajorAngle = Self.mMajorAngle - 360
@@ -238,6 +238,18 @@ Inherits ArtisanKit.Control
 		    Self.Invalidate
 		  End If
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Version() As String
+		  Dim Info As Introspection.TypeInfo = Introspection.GetType(Self)
+		  Dim MyAttributes() As Introspection.AttributeInfo = Info.GetAttributes
+		  For Each Item As Introspection.AttributeInfo In MyAttributes
+		    If Item.Name = "Version" Then
+		      Return Item.Value
+		    End If
+		  Next
+		End Function
 	#tag EndMethod
 
 
@@ -530,10 +542,10 @@ Inherits ArtisanKit.Control
 	#tag EndComputedProperty
 
 
-	#tag Constant, Name = AnimationDuration, Type = Double, Dynamic = False, Default = \"0.3", Scope = Private
+	#tag Constant, Name = AnimationDuration, Type = Double, Dynamic = False, Default = \"0.3", Scope = Private, Attributes = \"Hidden"
 	#tag EndConstant
 
-	#tag Constant, Name = RevolutionTime, Type = Double, Dynamic = False, Default = \"0.75", Scope = Private
+	#tag Constant, Name = RevolutionTime, Type = Double, Dynamic = False, Default = \"0.75", Scope = Private, Attributes = \"Hidden"
 	#tag EndConstant
 
 

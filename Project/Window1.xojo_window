@@ -143,7 +143,7 @@ Begin Window Window1
       Maximum         =   100.0
       Minimum         =   0.0
       Progress        =   0.0
-      Scope           =   0
+      Scope           =   2
       ScrollSpeed     =   20
       TabIndex        =   4
       TabPanelIndex   =   0
