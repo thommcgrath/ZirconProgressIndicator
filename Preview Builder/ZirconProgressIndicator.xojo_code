@@ -1,5 +1,5 @@
 #tag Class
- Attributes ( Version = "1.1.1" ) Protected Class ZirconProgressIndicator
+ Attributes ( Version = "1.1" ) Protected Class ZirconProgressIndicator
 Inherits ArtisanKit.Control
 	#tag Event
 		Sub AnimationStep(Key As String, Value As Double, Finished As Boolean)
@@ -625,7 +625,9 @@ Inherits ArtisanKit.Control
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DoubleBuffer"
+			Visible=true
 			Group="Behavior"
+			InitialValue="False"
 			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
@@ -637,7 +639,9 @@ Inherits ArtisanKit.Control
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="EraseBackground"
+			Visible=true
 			Group="Behavior"
+			InitialValue="True"
 			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
@@ -682,7 +686,6 @@ Inherits ArtisanKit.Control
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="InitialParent"
-			Group="Position"
 			Type="String"
 		#tag EndViewProperty
 		#tag ViewProperty

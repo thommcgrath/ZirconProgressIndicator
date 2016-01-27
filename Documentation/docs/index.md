@@ -52,3 +52,16 @@ The numeric value of the job completion. Values outside the range of the minimum
 
 <pre id="method.version"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;"><span style="color: #0000FF;">Function</span> Version() <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">String</span></span></pre>
 Returns the version number of the class. Can also be found in the class attributes.
+
+## Shared Methods
+
+<pre id="method.render"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;"><span style="color: #0000FF;">Shared</span> <span style="color: #0000FF;">Function</span> Render (Width <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Integer</span>, Height <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Integer</span>, ScalingFactor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, MinorAngle <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, MajorAngle <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, ForeColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, BackColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, CancelState <span style="color: #0000FF;">As</span> ZirconProgressIndicator.CancelStates) <span style="color: #0000FF;">As</span> Picture</span></pre>
+Be warned, this is an advanced feature use to generate indicator images at any state.
+
+- `Width` and `Height` specify the dimensions _in points_ for the image.
+- `ScalingFactor` parameter is a multiplier used for high resolution images. The pixel dimensions of the returned image will be (Width * ScalingFactor) * 72.
+- `MinorAngle` is the trailing angle. 0° is east, -90° north, 90° south, and 180° west. Values beyond range are perfectly acceptable. Values beyond range will be reduced into range. For example, 270° and 630° would both be reduced to -90°.
+- `MajorAngle` is the leading angle. Same rules apply.
+- `ForeColor` is the color of the fill.
+- `BackColor` is the color of the track.
+- `CancelState` is used to specify wether or not to draw a cancel button.

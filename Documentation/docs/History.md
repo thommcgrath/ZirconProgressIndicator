@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.1.1 - January 27th, 2016
+
+- Added ZirconProgressIndicator.Render shared method useful for drawing the indicator in other contexts. This method was used for building the preview found on the website.
+- Added ZirconProgressIndicator.CancelStates enumeration for use with the Render shared method.
+
 ## Version 1.1 - January 26th, 2016
 
 - Fixed issue with double-drawing the bottom-right quadrant of a filled indicator when the value was exactly 50%. This was most noticeable when using a foreground color with alpha channels.
