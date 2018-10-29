@@ -1,5 +1,5 @@
 #tag Class
- Attributes ( Version = "1.1.1" ) Protected Class ZirconProgressIndicator
+ Attributes ( Version = "1.2.0" ) Protected Class ZirconProgressIndicator
 Inherits ArtisanKit.Control
 	#tag Event
 		Sub AnimationStep(Key As String, Value As Double, Finished As Boolean)
@@ -26,6 +26,14 @@ Inherits ArtisanKit.Control
 		    Self.mBackColor = RGB(Self.mBackColor.Red, Self.mBackColor.Green, Value, Self.mBackColor.Alpha)
 		  Case "back-alpha"
 		    Self.mBackColor = RGB(Self.mBackColor.Red, Self.mBackColor.Green, Self.mBackColor.Blue, Value)
+		  Case "border-red"
+		    Self.mBorderColor = RGB(Value, Self.mBorderColor.Green, Self.mBorderColor.Blue, Self.mBorderColor.Alpha)
+		  Case "border-green"
+		    Self.mBorderColor = RGB(Self.mBorderColor.Red, Value, Self.mBorderColor.Blue, Self.mBorderColor.Alpha)
+		  Case "border-blue"
+		    Self.mBorderColor = RGB(Self.mBorderColor.Red, Self.mBorderColor.Green, Value, Self.mBorderColor.Alpha)
+		  Case "border-alpha"
+		    Self.mBorderColor = RGB(Self.mBorderColor.Red, Self.mBorderColor.Green, Self.mBorderColor.Blue, Value)
 		  Case "angle-major"
 		    Self.mMajorAngle = Value
 		    If Finished And Self.Indeterminate Then
@@ -107,7 +115,25 @@ Inherits ArtisanKit.Control
 		    CancelState = ZirconProgressIndicator.CancelStates.Disabled
 		  End If
 		  
-		  Dim Pic As Picture = Self.Render(Self.Width, Self.Height, ScalingFactor, Self.mMinorAngle, Self.mMajorAngle, Self.ForeColor, Self.BackColor, CancelState)
+		  Dim BorderColor As Color
+		  If Self.AutomaticBorderColor Then
+		    Dim WindowBackColor As Color = If(ArtisanKit.IsDarkMode, &c25252500, &cE7E7E700)
+		    Dim EffectiveBackColor As Color
+		    Dim BackOpacity As Double = 1 - (BackColor.Alpha / 255)
+		    Dim RedAmount As Integer = (WindowBackColor.Red * (1 - BackOpacity)) + (BackColor.Red * BackOpacity)
+		    Dim GreenAmount As Integer = (WindowBackColor.Green * (1 - BackOpacity)) + (BackColor.Green * BackOpacity)
+		    Dim BlueAmount As Integer = (WindowBackColor.Blue * (1 - BackOpacity)) + (BackColor.Blue * BackOpacity)
+		    EffectiveBackColor = RGB(RedAmount, GreenAmount, BlueAmount)
+		    If ArtisanKit.ColorIsBright(EffectiveBackColor) Then
+		      BorderColor = &c000000D8
+		    Else
+		      BorderColor = &cFFFFFFBF
+		    End If
+		  Else
+		    BorderColor = Self.BorderColor
+		  End If
+		  
+		  Dim Pic As Picture = Self.Render(Self.Width, Self.Height, ScalingFactor, Self.mMinorAngle, Self.mMajorAngle, Self.ForeColor, Self.BackColor, BorderColor, CancelState)
 		  G.DrawPicture(Pic, 0, 0, G.Width, G.Height, 0, 0, Pic.Width, Pic.Height)
 		End Sub
 	#tag EndEvent
@@ -155,7 +181,7 @@ Inherits ArtisanKit.Control
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		 Shared Function Render(Width As Integer, Height As Integer, ScalingFactor As Double, MinorAngle As Double, MajorAngle As Double, ForeColor As Color, BackColor As Color, CancelState As ZirconProgressIndicator.CancelStates) As Picture
+		Shared Function Render(Width As Integer, Height As Integer, ScalingFactor As Double, MinorAngle As Double, MajorAngle As Double, ForeColor As Color, BackColor As Color, BorderColor As Color, CancelState As ZirconProgressIndicator.CancelStates) As Picture
 		  If Not ZirconProgressIndicator.Registered Then
 		    Return New Picture(Width, Height)
 		  End If
@@ -210,7 +236,7 @@ Inherits ArtisanKit.Control
 		  Temp.Graphics.DrawPicture(Mask, 0, 0)
 		  Surface.ApplyMask(Temp)
 		  
-		  Surface.Graphics.ForeColor = &c000000E4
+		  Surface.Graphics.ForeColor = BorderColor
 		  Surface.Graphics.PenWidth = Max(Rect.Width / 75, 1) * ScalingFactor
 		  Surface.Graphics.PenHeight = Surface.Graphics.PenWidth
 		  Surface.Graphics.DrawOval(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
@@ -236,6 +262,12 @@ Inherits ArtisanKit.Control
 		  Surface.HorizontalResolution = 72 * ScalingFactor
 		  Surface.VerticalResolution = 72 * ScalingFactor
 		  Return Surface
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Attributes( Deprecated )  Shared Function Render(Width As Integer, Height As Integer, ScalingFactor As Double, MinorAngle As Double, MajorAngle As Double, ForeColor As Color, BackColor As Color, CancelState As ZirconProgressIndicator.CancelStates) As Picture
+		  Return Render(Width, Height, ScalingFactor, MinorAngle, MajorAngle, ForeColor, BackColor, &c000000E4, CancelState)
 		End Function
 	#tag EndMethod
 
@@ -289,6 +321,25 @@ Inherits ArtisanKit.Control
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
+			  Return Self.mAutomaticBorderColor
+			End Get
+		#tag EndGetter
+		#tag Setter
+			Set
+			  If Self.mAutomaticBorderColor = Value Then
+			    Return
+			  End If
+			  
+			  Self.mAutomaticBorderColor = Value
+			  Self.Invalidate
+			End Set
+		#tag EndSetter
+		AutomaticBorderColor As Boolean
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
 			  Return Self.mBackColor
 			End Get
 		#tag EndGetter
@@ -319,6 +370,45 @@ Inherits ArtisanKit.Control
 			End Set
 		#tag EndSetter
 		BackColor As Color
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  Return Self.mBorderColor
+			End Get
+		#tag EndGetter
+		#tag Setter
+			Set
+			  If Self.mBorderColor = Value Then
+			    Return
+			  End If
+			  
+			  If Self.AutomaticBorderColor Or Self.Animated = False Then
+			    Self.mBorderColor = Value
+			    If Not Self.AutomaticBorderColor Then
+			      Self.Invalidate
+			    End If
+			    Return
+			  End If
+			  
+			  If Not Self.AutomaticBorderColor Then
+			    If Self.mBorderColor.Red <> Value.Red Then
+			      Self.StartAnimation("border-red", Self.mBorderColor.Red, Value.Red, Self.AnimationDuration)
+			    End If
+			    If Self.mBorderColor.Green <> Value.Green Then
+			      Self.StartAnimation("border-green", Self.mBorderColor.Green, Value.Green, Self.AnimationDuration)
+			    End If
+			    If Self.mBorderColor.Blue <> Value.Blue Then
+			      Self.StartAnimation("border-blue", Self.mBorderColor.Blue, Value.Blue, Self.AnimationDuration)
+			    End If
+			    If Self.mBorderColor.Alpha <> Value.Alpha Then
+			      Self.StartAnimation("border-alpha", Self.mBorderColor.Alpha, Value.Alpha, Self.AnimationDuration)
+			    End If
+			  End If
+			End Set
+		#tag EndSetter
+		BorderColor As Color
 	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -410,6 +500,10 @@ Inherits ArtisanKit.Control
 		Attributes( Hidden ) Private mAnimatedValue As Double
 	#tag EndProperty
 
+	#tag Property, Flags = &h21
+		Attributes( Hidden ) Private mAutomaticBorderColor As Boolean
+	#tag EndProperty
+
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
@@ -440,6 +534,10 @@ Inherits ArtisanKit.Control
 
 	#tag Property, Flags = &h21
 		Attributes( Hidden ) Private mBackColor As Color = &cFFFFFFFF
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Attributes( Hidden ) Private mBorderColor As Color
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -578,79 +676,25 @@ Inherits ArtisanKit.Control
 
 	#tag ViewBehavior
 		#tag ViewProperty
-			Name="AcceptFocus"
+			Name="Index"
 			Visible=true
-			Group="Behavior"
-			Type="Boolean"
+			Group="ID"
+			Type="Integer"
+			EditorType="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="AcceptTabs"
+			Name="Name"
 			Visible=true
-			Group="Behavior"
-			Type="Boolean"
+			Group="ID"
+			Type="String"
+			EditorType="String"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Animated"
+			Name="Super"
 			Visible=true
-			Group="Behavior"
-			InitialValue="True"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="AutoDeactivate"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="BackColor"
-			Visible=true
-			Group="Behavior"
-			InitialValue="&cFFFFFFFF"
-			Type="Color"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Backdrop"
-			Group="Appearance"
-			Type="Picture"
-			EditorType="Picture"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="CanCancel"
-			Visible=true
-			Group="Behavior"
-			InitialValue="True"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="DoubleBuffer"
-			Group="Behavior"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Enabled"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="EraseBackground"
-			Group="Behavior"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="ForeColor"
-			Visible=true
-			Group="Behavior"
-			InitialValue="&c4A91D5"
-			Type="Color"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="HasFocus"
-			Group="Behavior"
-			Type="Boolean"
+			Group="ID"
+			Type="String"
+			EditorType="String"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Height"
@@ -658,27 +702,6 @@ Inherits ArtisanKit.Control
 			Group="Position"
 			InitialValue="100"
 			Type="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="HelpTag"
-			Visible=true
-			Group="Appearance"
-			Type="String"
-			EditorType="MultiLineEditor"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Indeterminate"
-			Visible=true
-			Group="Behavior"
-			InitialValue="False"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Index"
-			Visible=true
-			Group="ID"
-			Type="Integer"
-			EditorType="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="InitialParent"
@@ -716,45 +739,6 @@ Inherits ArtisanKit.Control
 			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Maximum"
-			Visible=true
-			Group="Behavior"
-			InitialValue="100"
-			Type="Double"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Minimum"
-			Visible=true
-			Group="Behavior"
-			InitialValue="0"
-			Type="Double"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Name"
-			Visible=true
-			Group="ID"
-			Type="String"
-			EditorType="String"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Progress"
-			Group="Behavior"
-			Type="Double"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="ScrollSpeed"
-			Group="Behavior"
-			InitialValue="20"
-			Type="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Super"
-			Visible=true
-			Group="ID"
-			Type="String"
-			EditorType="String"
-		#tag EndViewProperty
-		#tag ViewProperty
 			Name="TabIndex"
 			Visible=true
 			Group="Position"
@@ -781,12 +765,38 @@ Inherits ArtisanKit.Control
 			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Transparent"
+			Name="Width"
 			Visible=true
-			Group="Behavior"
+			Group="Position"
+			InitialValue="100"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AutoDeactivate"
+			Visible=true
+			Group="Appearance"
 			InitialValue="True"
 			Type="Boolean"
-			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Backdrop"
+			Group="Appearance"
+			Type="Picture"
+			EditorType="Picture"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Enabled"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="HelpTag"
+			Visible=true
+			Group="Appearance"
+			Type="String"
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="UseFocusRing"
@@ -796,13 +806,6 @@ Inherits ArtisanKit.Control
 			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Value"
-			Visible=true
-			Group="Behavior"
-			InitialValue="50"
-			Type="Double"
-		#tag EndViewProperty
-		#tag ViewProperty
 			Name="Visible"
 			Visible=true
 			Group="Appearance"
@@ -810,11 +813,126 @@ Inherits ArtisanKit.Control
 			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Width"
+			Name="NeedsFullKeyboardAccessForFocus"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AcceptFocus"
 			Visible=true
-			Group="Position"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AcceptTabs"
+			Visible=true
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Animated"
+			Visible=true
+			Group="Behavior"
+			InitialValue="True"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="BackColor"
+			Visible=true
+			Group="Behavior"
+			InitialValue="&cFFFFFFFF"
+			Type="Color"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="CanCancel"
+			Visible=true
+			Group="Behavior"
+			InitialValue="True"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="DoubleBuffer"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="EraseBackground"
+			Group="Behavior"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ForeColor"
+			Visible=true
+			Group="Behavior"
+			InitialValue="&c4A91D5"
+			Type="Color"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="HasFocus"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Indeterminate"
+			Visible=true
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Maximum"
+			Visible=true
+			Group="Behavior"
 			InitialValue="100"
+			Type="Double"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Minimum"
+			Visible=true
+			Group="Behavior"
+			InitialValue="0"
+			Type="Double"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Progress"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ScrollSpeed"
+			Group="Behavior"
+			InitialValue="20"
 			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Transparent"
+			Visible=true
+			Group="Behavior"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Value"
+			Visible=true
+			Group="Behavior"
+			InitialValue="50"
+			Type="Double"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AutomaticBorderColor"
+			Visible=true
+			Group="Behavior"
+			InitialValue="True"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="BorderColor"
+			Visible=true
+			Group="Behavior"
+			InitialValue="&c000000E4"
+			Type="Color"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

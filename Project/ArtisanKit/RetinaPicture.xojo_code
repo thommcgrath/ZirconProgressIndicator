@@ -2,7 +2,7 @@
 Protected Class RetinaPicture
 Inherits Picture
 	#tag Method, Flags = &h0
-		 Shared Function CreateFrom(LowRes As Picture, HiRes As Picture) As ArtisanKit.RetinaPicture
+		Shared Function CreateFrom(LowRes As Picture, HiRes As Picture) As ArtisanKit.RetinaPicture
 		  Dim Result As New ArtisanKit.RetinaPicture(LowRes.Width,LowRes.Height)
 		  Result.Graphics.DrawPicture(LowRes,0,0)
 		  Result.HiRes = HiRes
@@ -13,7 +13,7 @@ Inherits Picture
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		 Shared Function Open(File As FolderItem) As ArtisanKit.RetinaPicture
+		Shared Function Open(File As FolderItem) As ArtisanKit.RetinaPicture
 		  Dim FilenameLow, FilenameHigh As String
 		  If Instr(File.Name,"@2x") > 0 Then
 		    FilenameHigh = File.Name
@@ -153,8 +153,8 @@ Inherits Picture
 			EditorType="Enum"
 			#tag EnumValues
 				"0 - Image"
-				"1 - VectorImage"
-				"2 - Bitmap"
+				"1 - Vector"
+				"2 - MutableBitmap"
 				"3 - ImmutableBitmap"
 			#tag EndEnumValues
 		#tag EndViewProperty

@@ -40,13 +40,18 @@ Inherits Canvas
 
 	#tag Event
 		Sub Open()
+		  Self.NeedsFullKeyboardAccessForFocus = True
 		  RaiseEvent Open
-		  Self.DoubleBuffer = TargetWin32
-		  Self.EraseBackground = Not Self.DoubleBuffer
-		  #if XojoVersion >= 2013.04
-		    Self.Transparent = Self.EraseBackground
+		  #if XojoVersion < 2018.01
+		    Self.DoubleBuffer = TargetWin32
+		    Self.EraseBackground = Not Self.DoubleBuffer
+		    #if XojoVersion >= 2013.04
+		      Self.Transparent = Self.EraseBackground
+		    #endif
+		  #else
+		    Self.DoubleBuffer = False
 		  #endif
-		  Self.TabStop = Self.TabStop And Self.AcceptFocus And ArtisanKit.FullKeyboardAccessEnabled
+		  Self.TabStop = (Self.TabStop Or Self.AcceptFocus) And (ArtisanKit.FullKeyboardAccessEnabled Or Self.NeedsFullKeyboardAccessForFocus = False)
 		End Sub
 	#tag EndEvent
 
@@ -58,16 +63,20 @@ Inherits Canvas
 		    Self.mLastPaintHeight = G.Height
 		  End If
 		  
-		  If Not Self.EraseBackground Then
-		    Dim BackgroundColor As Color
-		    If Self.TrueWindow.HasBackColor Then
-		      BackgroundColor = Self.TrueWindow.BackColor
-		    Else
-		      BackgroundColor = FillColor
-		    End If
-		    G.ForeColor = BackgroundColor
-		    G.FillRect(0,0,G.Width,G.Height)
-		  End If
+		  #if XojoVersion < 2018.01
+		    If Not Self.EraseBackground Then
+		      Dim BackgroundColor As Color
+		      If Self.Window <> Nil And Self.Window.HasBackColor Then
+		        BackgroundColor = Self.Window.BackColor
+		      Else
+		        BackgroundColor = FillColor
+		      End If
+		      G.ForeColor = BackgroundColor
+		      G.FillRect(0,0,G.Width,G.Height)
+		    End If  
+		  #else
+		    G.ClearRect(0,0,G.Width,G.Height)
+		  #endif
 		  
 		  Dim Highlighted As Boolean
 		  If Self.Enabled Then
@@ -128,17 +137,9 @@ Inherits Canvas
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub BeginFocusRing(G As Graphics)
-		  #if TargetCocoa
-		    Declare Sub NSSetFocusRingStyle Lib "Cocoa.framework" (Placement As Integer)
-		    Declare Sub CGContextBeginTransparencyLayer Lib "Cocoa.framework" (Context As Integer, AuxInfo As Integer)
-		    
-		    Const NSFocusRingAbove = 2
-		    
-		    Dim Context As Integer = G.Handle(G.HandleTypeCGContextRef)
-		    NSSetFocusRingStyle(NSFocusRingAbove)
-		    CGContextBeginTransparencyLayer(Context,0)
-		  #endif
+		Attributes( Deprecated = "ArtisanKit.BeginFocusRing" ) Protected Sub BeginFocusRing(G As Graphics)
+		  #Pragma Unused G
+		  ArtisanKit.BeginFocusRing()
 		End Sub
 	#tag EndMethod
 
@@ -158,13 +159,9 @@ Inherits Canvas
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub EndFocusRing(G As Graphics)
-		  #if TargetCocoa
-		    Declare Sub CGContextEndTransparencyLayer Lib "Cocoa.framework" (Context As Integer)
-		    
-		    Dim Context As Integer = G.Handle(G.HandleTypeCGContextRef)
-		    CGContextEndTransparencyLayer(Context)
-		  #endif
+		Attributes( Deprecated = "ArtisanKit.EndFocusRing" ) Protected Sub EndFocusRing(G As Graphics)
+		  #Pragma Unused G
+		  ArtisanKit.EndFocusRing()
 		End Sub
 	#tag EndMethod
 
@@ -175,32 +172,48 @@ Inherits Canvas
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Invalidate(eraseBackground As Boolean = True)
+		Sub Invalidate(EraseBackground As Boolean = True)
 		  If Not Self.mInvalidated Then
-		    Super.Invalidate(EraseBackground And Self.EraseBackground)
+		    #if XojoVersion >= 2018.01
+		      Super.Invalidate(EraseBackground)
+		    #else
+		      Super.Invalidate(EraseBackground And Self.EraseBackground)
+		    #endif
 		    Self.mInvalidated = True
 		  End If
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Invalidate(x As Integer, y As Integer, width As Integer, height As Integer, eraseBackground As Boolean = True)
+		Sub Invalidate(X As Integer, Y As Integer, Width As Integer, Height As Integer, EraseBackground As Boolean = True)
 		  If Not Self.mInvalidated Then
-		    Super.Invalidate(X,Y,Width,Height,EraseBackground And Self.EraseBackground)
+		    #if XojoVersion >= 2018.01
+		      Super.Invalidate(X, Y, Width, Height, EraseBackground)
+		    #else
+		      Super.Invalidate(X, Y, Width, Height, EraseBackground And Self.EraseBackground)
+		    #endif
 		    Self.mInvalidated = True
 		  End If
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Refresh(eraseBackground As Boolean = True)
-		  Super.Refresh(EraseBackground And Self.EraseBackground)
+		Sub Refresh(EraseBackground As Boolean = True)
+		  #if XojoVersion >= 2018.01
+		    Super.Refresh(EraseBackground)
+		  #else
+		    Super.Refresh(EraseBackground And Self.EraseBackground)
+		  #endif
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub RefreshRect(x As Integer, y As Integer, width As Integer, height As Integer, eraseBackground As Boolean = True)
-		  Super.RefreshRect(X,Y,Width,Height,EraseBackground And Self.EraseBackground)
+		Sub RefreshRect(X As Integer, Y As Integer, Width As Integer, Height As Integer, EraseBackground As Boolean = True)
+		  #if XojoVersion >= 2018.01
+		    Super.RefreshRect(X, Y, Width, Height, EraseBackground)
+		  #else
+		    Super.RefreshRect(X, Y, Width, Height, EraseBackground And Self.EraseBackground)
+		  #endif
 		End Sub
 	#tag EndMethod
 
@@ -336,6 +349,10 @@ Inherits Canvas
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
+		NeedsFullKeyboardAccessForFocus As Boolean
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
 		ScrollSpeed As Integer = 20
 	#tag EndProperty
 
@@ -399,6 +416,7 @@ Inherits Canvas
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="HasFocus"
@@ -466,6 +484,11 @@ Inherits Canvas
 			Group="ID"
 			Type="String"
 			EditorType="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="NeedsFullKeyboardAccessForFocus"
+			Group="Behavior"
+			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="ScrollSpeed"

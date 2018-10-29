@@ -2,6 +2,22 @@
 Protected Module ArtisanKit
 	#tag CompatibilityFlags = ( TargetHasGUI )
 	#tag Method, Flags = &h1
+		Protected Sub BeginFocusRing()
+		  #if TargetCocoa
+		    Const NSFocusRingAbove = 2
+		    
+		    Declare Function NSClassFromString Lib "Cocoa.framework" (ClassName As CFStringRef) As Ptr
+		    Declare Sub SaveGraphicsState Lib "Cocoa.framework" Selector "saveGraphicsState" (Target As Ptr)
+		    Declare Sub NSSetFocusRingStyle Lib "Cocoa.framework" (Placement As Integer)
+		    
+		    Dim GraphicsContextClass As Ptr = NSClassFromString("NSGraphicsContext")
+		    SaveGraphicsState(GraphicsContextClass)
+		    NSSetFocusRingStyle(NSFocusRingAbove)
+		  #endif
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function BlendColors(Color1 As Color, Color2 As Color, Color2Opacity As Double = 1) As Color
 		  if Color1.Alpha <> 0 Or Color2.Alpha <> 0 Then
 		    Dim Err As New UnsupportedOperationException
@@ -97,6 +113,25 @@ Protected Module ArtisanKit
 	#tag Method, Flags = &h1
 		Protected Function ColorBrightness(C As Color) As Integer
 		  Return Exp(Log((C.Red * C.Red * 0.241) + (C.Green * C.Green * 0.691) + (C.Blue * C.Blue * 0.068)) * 0.5)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function ColorIsBright(Source As Color) As Boolean
+		  Return ColorLuminance(Source) > 0.65 Or ColorBrightness(Source) >= 170
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function ColorLuminance(Source As Color) As Double
+		  If Source.Red = Source.Green And Source.Green = Source.Blue Then
+		    Return Source.Red / 255
+		  End If
+		  
+		  Dim Red As Double = (Source.Red / 255) ^ 2.2
+		  Dim Green As Double = (Source.Green / 255) ^ 2.2
+		  Dim Blue As Double = (Source.Blue / 255) ^ 2.2
+		  Return (0.2126 * Red) + (0.7151 * Green) + (0.0721 * Blue)
 		End Function
 	#tag EndMethod
 
@@ -218,6 +253,18 @@ Protected Module ArtisanKit
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Sub EndFocusRing()
+		  #if TargetCocoa
+		    Declare Function NSClassFromString Lib "Cocoa.framework" (ClassName As CFStringRef) As Ptr
+		    Declare Sub RestoreGraphicsState Lib "Cocoa.framework" Selector "restoreGraphicsState" (Target As Ptr)
+		    
+		    Dim GraphicsContextClass As Ptr = NSClassFromString("NSGraphicsContext")
+		    RestoreGraphicsState(GraphicsContextClass)
+		  #endif
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub FillWithPattern(Extends G As Graphics, Source As Picture, Area As REALbasic.Rect, SourcePortion As REALbasic.Rect = Nil)
 		  Dim Factor As Double = G.ScalingFactor
@@ -226,13 +273,21 @@ Protected Module ArtisanKit
 		    SourcePortion = New REALbasic.Rect(0,0,Source.Width,Source.Height)
 		  End If
 		  
+		  Dim SourceWidth, SourceHeight As Integer
+		  SourceWidth = SourcePortion.Width
+		  SourceHeight = SourcePortion.Height
+		  If Not (Source IsA ArtisanKit.RetinaPicture) Then
+		    SourceWidth = SourceWidth / Factor
+		    SourceHeight = SourceHeight / Factor
+		  End If
+		  
 		  Dim X, Y As Integer
-		  For X = 0 To Area.Width Step Source.Width / Factor
-		    For Y = 0 To Area.Height Step Source.Height / Factor
+		  For X = 0 To Area.Width Step SourceWidth
+		    For Y = 0 To Area.Height Step SourceHeight
 		      If Source IsA ArtisanKit.RetinaPicture Then
-		        Destination.DrawRetinaPicture(ArtisanKit.RetinaPicture(Source),X,Y,SourcePortion.Width,SourcePortion.Height,SourcePortion.Left,SourcePortion.Top,SourcePortion.Width,SourcePortion.Height)
+		        Destination.DrawRetinaPicture(ArtisanKit.RetinaPicture(Source),X,Y,SourceWidth,SourceHeight,SourcePortion.Left,SourcePortion.Top,SourcePortion.Width,SourcePortion.Height)
 		      Else
-		        Destination.DrawPicture(Source,X,Y,SourcePortion.Width / Factor,SourcePortion.Height / Factor,SourcePortion.Left,SourcePortion.Top,SourcePortion.Width,SourcePortion.Height)
+		        Destination.DrawPicture(Source,X,Y,SourceWidth,SourceHeight / Factor,SourcePortion.Left,SourcePortion.Top,SourcePortion.Width,SourcePortion.Height)
 		      End If
 		    Next
 		  Next
@@ -258,8 +313,22 @@ Protected Module ArtisanKit
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Function IsDarkMode() As Boolean
+		  #if XojoVersion >= 2018.03
+		    Return REALbasic.IsDarkMode
+		  #else
+		    Return False
+		  #endif
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function ScalingFactor(Extends G As Graphics) As Single
+		  #if XojoVersion >= 2016.04
+		    Return G.ScaleX
+		  #endif
+		  
 		  #if TargetCocoa
 		    #if Target64Bit
 		      Dim UserSize, DeviceSize As CGSize64
@@ -289,7 +358,7 @@ Protected Module ArtisanKit
 
 	#tag Note, Name = Version
 		
-		1.0.2
+		1.1.0
 	#tag EndNote
 
 

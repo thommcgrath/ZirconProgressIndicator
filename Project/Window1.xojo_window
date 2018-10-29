@@ -9,23 +9,23 @@ Begin Window Window1
    FullScreen      =   False
    FullScreenButton=   False
    HasBackColor    =   False
-   Height          =   227
+   Height          =   259
    ImplicitInstance=   True
    LiveResize      =   True
    MacProcID       =   0
-   MaxHeight       =   227
+   MaxHeight       =   259
    MaximizeButton  =   True
-   MaxWidth        =   655
+   MaxWidth        =   667
    MenuBar         =   978746498
    MenuBarVisible  =   True
-   MinHeight       =   227
+   MinHeight       =   259
    MinimizeButton  =   True
-   MinWidth        =   655
+   MinWidth        =   667
    Placement       =   2
    Resizeable      =   True
    Title           =   "ZirconProgressIndicator"
    Visible         =   True
-   Width           =   655
+   Width           =   667
    Begin Slider ValueSlider
       AutoDeactivate  =   True
       Enabled         =   True
@@ -50,6 +50,7 @@ Begin Window Window1
       TabStop         =   True
       TickStyle       =   "0"
       Top             =   88
+      Transparent     =   False
       Value           =   50
       Visible         =   True
       Width           =   179
@@ -80,10 +81,11 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   21
+      Top             =   20
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   150
+      Width           =   162
    End
    Begin PushButton BackColorButton
       AutoDeactivate  =   True
@@ -111,49 +113,11 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   53
+      Top             =   60
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   150
-   End
-   Begin ZirconProgressIndicator Indicator
-      AcceptFocus     =   False
-      AcceptTabs      =   False
-      Animated        =   True
-      AutoDeactivate  =   True
-      BackColor       =   &cCCCCCC00
-      Backdrop        =   0
-      CanCancel       =   True
-      DoubleBuffer    =   False
-      Enabled         =   True
-      EraseBackground =   False
-      ForeColor       =   &c4A91D500
-      HasFocus        =   False
-      Height          =   150
-      HelpTag         =   ""
-      Indeterminate   =   False
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Left            =   323
-      LockBottom      =   False
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   False
-      LockTop         =   True
-      Maximum         =   100.0
-      Minimum         =   0.0
-      Progress        =   0.0
-      Scope           =   2
-      ScrollSpeed     =   20
-      TabIndex        =   4
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Top             =   20
-      Transparent     =   True
-      UseFocusRing    =   True
-      Value           =   50.0
-      Visible         =   True
-      Width           =   150
+      Width           =   162
    End
    Begin PushButton TransparentButton
       AutoDeactivate  =   True
@@ -181,10 +145,11 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   85
+      Top             =   92
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   150
+      Width           =   162
    End
    Begin CheckBox IndeterminateCheck
       AutoDeactivate  =   True
@@ -213,10 +178,11 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   123
+      Transparent     =   False
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   138
+      Width           =   179
    End
    Begin CheckBox AnimatedCheck
       AutoDeactivate  =   True
@@ -245,10 +211,11 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   155
+      Transparent     =   False
       Underline       =   False
       Value           =   True
       Visible         =   True
-      Width           =   138
+      Width           =   179
    End
    Begin CheckBox CancelCheck
       AutoDeactivate  =   True
@@ -277,10 +244,11 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   187
+      Transparent     =   False
       Underline       =   False
       Value           =   True
       Visible         =   True
-      Width           =   138
+      Width           =   179
    End
    Begin TextField MinimumField
       AcceptTabs      =   False
@@ -319,6 +287,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   20
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -346,6 +315,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   10
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Minimum:"
       TextAlign       =   2
       TextColor       =   &c00000000
@@ -395,6 +365,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   54
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -422,6 +393,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   12
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Maximum:"
       TextAlign       =   2
       TextColor       =   &c00000000
@@ -456,6 +428,7 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   13
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Value:"
       TextAlign       =   2
       TextColor       =   &c00000000
@@ -467,6 +440,113 @@ Begin Window Window1
       Underline       =   False
       Visible         =   True
       Width           =   100
+   End
+   Begin PushButton BorderColorButton
+      AutoDeactivate  =   True
+      Bold            =   False
+      ButtonStyle     =   "0"
+      Cancel          =   True
+      Caption         =   "Change Border Color"
+      Default         =   False
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   485
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   2
+      TabIndex        =   14
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   132
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   162
+   End
+   Begin CheckBox AutomaticBorderColorCheck
+      AutoDeactivate  =   True
+      Bold            =   False
+      Caption         =   "Automatic Border Color"
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   132
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   2
+      State           =   1
+      TabIndex        =   15
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   219
+      Transparent     =   False
+      Underline       =   False
+      Value           =   True
+      Visible         =   True
+      Width           =   179
+   End
+   Begin ZirconProgressIndicator Indicator
+      AcceptFocus     =   False
+      AcceptTabs      =   False
+      Animated        =   True
+      AutoDeactivate  =   True
+      AutomaticBorderColor=   True
+      BackColor       =   &cCCCCCC00
+      Backdrop        =   0
+      BorderColor     =   &c000000E4
+      CanCancel       =   True
+      DoubleBuffer    =   False
+      Enabled         =   True
+      EraseBackground =   False
+      ForeColor       =   &c4A91D500
+      HasFocus        =   False
+      Height          =   150
+      HelpTag         =   ""
+      Indeterminate   =   False
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Left            =   323
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Maximum         =   100.0
+      Minimum         =   0.0
+      NeedsFullKeyboardAccessForFocus=   False
+      Progress        =   0.0
+      Scope           =   2
+      ScrollSpeed     =   20
+      TabIndex        =   16
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Top             =   20
+      Transparent     =   True
+      UseFocusRing    =   True
+      Value           =   50.0
+      Visible         =   True
+      Width           =   150
    End
 End
 #tag EndWindow
@@ -498,13 +578,6 @@ End
 		  If SelectColor(C, "Choose background color") Then
 		    Indicator.BackColor = C
 		  End If
-		End Sub
-	#tag EndEvent
-#tag EndEvents
-#tag Events Indicator
-	#tag Event
-		Sub CancelPressed()
-		  MsgBox("Cancel")
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -551,6 +624,31 @@ End
 		  Indicator.Maximum = CDbl(Me.Text)
 		  ValueSlider.Maximum = Indicator.Maximum
 		  ValueSlider.Value = Indicator.Value
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events BorderColorButton
+	#tag Event
+		Sub Action()
+		  Dim C As Color = Indicator.BorderColor
+		  If SelectColor(C, "Choose border color") Then
+		    AutomaticBorderColorCheck.Value = False
+		    Indicator.BorderColor = C
+		  End If
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events AutomaticBorderColorCheck
+	#tag Event
+		Sub Action()
+		  Indicator.AutomaticBorderColor = Me.Value
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events Indicator
+	#tag Event
+		Sub CancelPressed()
+		  MsgBox("Cancel")
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -601,7 +699,6 @@ End
 			"7 - Global Floating Window"
 			"8 - Sheet Window"
 			"9 - Metal Window"
-			"10 - Drawer Window"
 			"11 - Modeless Dialog"
 		#tag EndEnumValues
 	#tag EndViewProperty

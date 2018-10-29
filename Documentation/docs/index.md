@@ -24,8 +24,14 @@ If the cancel button has been pressed, this event will be triggered.
 <pre id="property.animated"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;">Animated <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Boolean</span> = <span style="color: #0000FF;">True</span></span></pre>
 If true, the properties `BackColor`, `ForeColor`, `Maximum`, `Minimum`, `Value`, and `Progress` will animate their value changes. Visual changes will be applied over the next 0.25 seconds, however reading the property will immediately return the new value.
 
+<pre id="property.automaticbordercolor"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;">AutomaticBorderColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Boolean</span></span></pre>
+Enabled by default, this property causes the indicator to calculate the border color based on the background color of the window and the background color of the control, accounting for the opacity of the control's background color. This allows the control to automatically adapt for macOS 10.14's dark mode. When enabled, the `BorderColor` property is ignored.
+
 <pre id="property.backcolor"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;">BackColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span> = &amp;cFFFFFFFF</span></pre>
 The background color of the fillable section of the indicator.
+
+<pre id="property.bordercolor"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;">BorderColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span></span></pre>
+When `AutomaticBorderColor` is turned off, specifies the border color around the indicator. Translucency is supported with this property.
 
 <pre id="property.cancancel"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;">CanCancel <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Boolean</span> = <span style="color: #0000FF;">True</span></span></pre>
 If true, the control will draw a clickable square stop icon in the middle of the indicator. If clicked, the `CancelPressed` event will be fired.
@@ -55,7 +61,7 @@ Returns the version number of the class. Can also be found in the class attribut
 
 ## Shared Methods
 
-<pre id="method.render"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;"><span style="color: #0000FF;">Shared</span> <span style="color: #0000FF;">Function</span> Render (Width <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Integer</span>, Height <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Integer</span>, ScalingFactor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, MinorAngle <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, MajorAngle <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, ForeColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, BackColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, CancelState <span style="color: #0000FF;">As</span> ZirconProgressIndicator.CancelStates) <span style="color: #0000FF;">As</span> Picture</span></pre>
+<pre id="method.render"><span style="font-family: 'source-code-pro', 'menlo', 'courier', monospace; color: #000000;"><span style="color: #0000FF;">Shared</span> <span style="color: #0000FF;">Function</span> Render (Width <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Integer</span>, Height <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Integer</span>, ScalingFactor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, MinorAngle <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, MajorAngle <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Double</span>, ForeColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, BackColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, BorderColor <span style="color: #0000FF;">As</span> <span style="color: #0000FF;">Color</span>, CancelState <span style="color: #0000FF;">As</span> ZirconProgressIndicator.CancelStates) <span style="color: #0000FF;">As</span> Picture</span></pre>
 Be warned, this is an advanced feature use to generate indicator images at any state.
 
 - `Width` and `Height` specify the dimensions _in points_ for the image.
@@ -64,4 +70,5 @@ Be warned, this is an advanced feature use to generate indicator images at any s
 - `MajorAngle` is the leading angle. Same rules apply.
 - `ForeColor` is the color of the fill.
 - `BackColor` is the color of the track.
+- `BorderColor` is the border color around the track.
 - `CancelState` is used to specify wether or not to draw a cancel button.
