@@ -138,12 +138,6 @@ Inherits ArtisanKit.Control
 		End Sub
 	#tag EndEvent
 
-	#tag Event
-		Sub ScaleFactorChanged()
-		  Self.Invalidate
-		End Sub
-	#tag EndEvent
-
 
 	#tag Method, Flags = &h21
 		Attributes( Hidden ) Private Function AngleForProgress(Progress As Double) As Double
@@ -237,7 +231,7 @@ Inherits ArtisanKit.Control
 		  Surface.ApplyMask(Temp)
 		  
 		  Surface.Graphics.ForeColor = BorderColor
-		  Surface.Graphics.PenWidth = Max(Rect.Width / 75, 1) * ScalingFactor
+		  Surface.Graphics.PenWidth = Max(Rect.Width / (37.5 * ScalingFactor), 1) * ScalingFactor
 		  Surface.Graphics.PenHeight = Surface.Graphics.PenWidth
 		  Surface.Graphics.DrawOval(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
 		  Surface.Graphics.DrawOval(InsideRect.Left - Surface.Graphics.PenWidth, InsideRect.Top - Surface.Graphics.PenWidth, InsideRect.Width + (Surface.Graphics.PenWidth * 2), InsideRect.Height + (Surface.Graphics.PenWidth * 2))
