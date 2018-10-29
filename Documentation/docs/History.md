@@ -1,5 +1,12 @@
 # Version History
 
+## Version 1.2.0 - October 29th, 2018
+
+- Added support for macOS 10.14 dark mode.
+- Added `AutomaticBorderColor As Boolean` property.
+- Added `BorderColor As Color` property.
+- Now requires Artisan Kit 1.1.0.
+
 ## Version 1.1.1 - January 27th, 2016
 
 - Added ZirconProgressIndicator.Render shared method useful for drawing the indicator in other contexts. This method was used for building the preview found on the website.
