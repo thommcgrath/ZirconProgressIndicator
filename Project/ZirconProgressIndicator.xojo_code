@@ -123,7 +123,11 @@ Inherits ArtisanKit.Control
 		  
 		  Var BorderColor As Color
 		  If Self.AutomaticBorderColor Then
-		    Var WindowBackColor As Color = If(Color.IsDarkMode, &c25252500, &cE7E7E700)
+		    #if XojoVersion >= 2020.02
+		      Var WindowBackColor As Color = If(Color.IsDarkMode, &c25252500, &cE7E7E700)
+		    #else
+		      Var WindowBackColor As Color = If(IsDarkMode, &c25252500, &cE7E7E700)
+		    #endif
 		    Var EffectiveBackColor As Color
 		    Var BackOpacity As Double = 1 - (BackColor.Alpha / 255)
 		    Var RedAmount As Integer = (WindowBackColor.Red * (1 - BackOpacity)) + (BackColor.Red * BackOpacity)
