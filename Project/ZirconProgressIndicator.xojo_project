@@ -1,6 +1,7 @@
 Type=Desktop
-RBProjectVersion=2018.03
+RBProjectVersion=2019.032
 MinIDEVersion=20070100
+OrigIDEVersion=20190200
 Class=ZirconProgressIndicator;ZirconProgressIndicator.xojo_code;&h00000000510CD7FF;&h0000000000000000;false
 Class=App;App.xojo_code;&h000000005971DBBA;&h0000000000000000;false
 Window=Window1;Window1.xojo_window;&h000000004210FFDC;&h0000000000000000;false

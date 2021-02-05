@@ -1,5 +1,5 @@
 #tag Class
- Attributes ( Version = "1.2.0" ) Protected Class ZirconProgressIndicator
+Protected Class ZirconProgressIndicator
 Inherits ArtisanKit.Control
 	#tag Event
 		Sub AnimationStep(Key As String, Value As Double, Finished As Boolean)
@@ -37,12 +37,18 @@ Inherits ArtisanKit.Control
 		  Case "angle-major"
 		    Self.mMajorAngle = Value
 		    If Finished And Self.Indeterminate Then
+		      Var WasAnimated As Boolean = Self.Animated
+		      Self.Animated = True
 		      Self.StartAnimation("angle-major", -60, 300, Self.RevolutionTime, False)
+		      Self.Animated = WasAnimated
 		    End If
 		  Case "angle-minor"
 		    Self.mMinorAngle = Value
 		    If Finished And Self.Indeterminate Then
+		      Var WasAnimated As Boolean = Self.Animated
+		      Self.Animated = True
 		      Self.StartAnimation("angle-minor", -120, 240, Self.RevolutionTime, False)
+		      Self.Animated = WasAnimated
 		    End If
 		  Else
 		    Return
@@ -58,11 +64,11 @@ Inherits ArtisanKit.Control
 		    Return False
 		  End If
 		  
-		  Dim Size As Integer = Min(Self.Width, Self.Height)
-		  Dim CancelSize As Double = Size / 4
+		  Var Size As Integer = Min(Self.Width, Self.Height)
+		  Var CancelSize As Double = Size / 4
 		  Self.mCancelRect = New REALbasic.Rect(Round((Self.Width - CancelSize) / 2), Round((Self.Height - CancelSize) / 2), Round(CancelSize), Round(CancelSize))
 		  
-		  If Self.mCancelRect.Contains(New REALbasic.Point(X, Y)) Then
+		  If Self.mCancelRect.Contains(New Xojo.Point(X, Y)) Then
 		    Self.mCancelPressed = True
 		    Self.Invalidate
 		    Return True
@@ -72,7 +78,7 @@ Inherits ArtisanKit.Control
 
 	#tag Event
 		Sub MouseDrag(X As Integer, Y As Integer)
-		  Dim Pressed As Boolean = Self.mCancelRect.Contains(New REALbasic.Point(X, Y))
+		  Var Pressed As Boolean = Self.mCancelRect.Contains(New Xojo.Point(X, Y))
 		  If Self.mCancelPressed <> Pressed Then
 		    Self.mCancelPressed = Pressed
 		    Self.Invalidate
@@ -82,7 +88,7 @@ Inherits ArtisanKit.Control
 
 	#tag Event
 		Sub MouseUp(X As Integer, Y As Integer)
-		  Dim Pressed As Boolean = Self.mCancelRect.Contains(New REALbasic.Point(X, Y))
+		  Var Pressed As Boolean = Self.mCancelRect.Contains(New Xojo.Point(X, Y))
 		  If Pressed Then
 		    RaiseEvent CancelPressed
 		  End If
@@ -100,11 +106,11 @@ Inherits ArtisanKit.Control
 	#tag EndEvent
 
 	#tag Event
-		Sub Paint(G As Graphics, Areas() As REALbasic.Rect, ScalingFactor As Double, Highlighted As Boolean)
+		Sub Paint(G As Graphics, Areas() As Xojo.Rect, Highlighted As Boolean)
 		  #Pragma Unused Areas
 		  #Pragma Unused Highlighted
 		  
-		  Dim CancelState As ZirconProgressIndicator.CancelStates
+		  Var CancelState As ZirconProgressIndicator.CancelStates
 		  If Self.CanCancel Then
 		    If Self.mCancelPressed Then
 		      CancelState = ZirconProgressIndicator.CancelStates.Pressed
@@ -115,14 +121,14 @@ Inherits ArtisanKit.Control
 		    CancelState = ZirconProgressIndicator.CancelStates.Disabled
 		  End If
 		  
-		  Dim BorderColor As Color
+		  Var BorderColor As Color
 		  If Self.AutomaticBorderColor Then
-		    Dim WindowBackColor As Color = If(ArtisanKit.IsDarkMode, &c25252500, &cE7E7E700)
-		    Dim EffectiveBackColor As Color
-		    Dim BackOpacity As Double = 1 - (BackColor.Alpha / 255)
-		    Dim RedAmount As Integer = (WindowBackColor.Red * (1 - BackOpacity)) + (BackColor.Red * BackOpacity)
-		    Dim GreenAmount As Integer = (WindowBackColor.Green * (1 - BackOpacity)) + (BackColor.Green * BackOpacity)
-		    Dim BlueAmount As Integer = (WindowBackColor.Blue * (1 - BackOpacity)) + (BackColor.Blue * BackOpacity)
+		    Var WindowBackColor As Color = If(Color.IsDarkMode, &c25252500, &cE7E7E700)
+		    Var EffectiveBackColor As Color
+		    Var BackOpacity As Double = 1 - (BackColor.Alpha / 255)
+		    Var RedAmount As Integer = (WindowBackColor.Red * (1 - BackOpacity)) + (BackColor.Red * BackOpacity)
+		    Var GreenAmount As Integer = (WindowBackColor.Green * (1 - BackOpacity)) + (BackColor.Green * BackOpacity)
+		    Var BlueAmount As Integer = (WindowBackColor.Blue * (1 - BackOpacity)) + (BackColor.Blue * BackOpacity)
 		    EffectiveBackColor = RGB(RedAmount, GreenAmount, BlueAmount)
 		    If ArtisanKit.ColorIsBright(EffectiveBackColor) Then
 		      BorderColor = &c000000D8
@@ -133,124 +139,128 @@ Inherits ArtisanKit.Control
 		    BorderColor = Self.BorderColor
 		  End If
 		  
-		  Dim Pic As Picture = Self.Render(Self.Width, Self.Height, ScalingFactor, Self.mMinorAngle, Self.mMajorAngle, Self.ForeColor, Self.BackColor, BorderColor, CancelState)
+		  Var Pic As Picture = Self.Render(Self.Width, Self.Height, G.ScaleX, Self.mMinorAngle, Self.mMajorAngle, Self.ForeColor, Self.BackColor, BorderColor, CancelState)
 		  G.DrawPicture(Pic, 0, 0, G.Width, G.Height, 0, 0, Pic.Width, Pic.Height)
 		End Sub
 	#tag EndEvent
 
 
 	#tag Method, Flags = &h21
-		Attributes( Hidden ) Private Function AngleForProgress(Progress As Double) As Double
-		  Dim Degrees As Double = 360 * Max(Min(Progress, 1), 0)
+		Private Function AngleForProgress(Progress As Double) As Double
+		  Var Degrees As Double = 360 * Max(Min(Progress, 1), 0)
 		  Return Degrees - 90
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Attributes( Hidden ) Private Function CalculateDuration(FromAngle As Double, ToAngle As Double) As Double
+		Private Function CalculateDuration(FromAngle As Double, ToAngle As Double) As Double
 		  Return Self.RevolutionTime * (Abs(ToAngle - FromAngle) / 360)
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Attributes( Hidden ) Private Shared Function DegreesToRadians(Degrees As Double) As Double
+		Private Shared Function DegreesToRadians(Degrees As Double) As Double
 		  Return Degrees * 0.01745329252
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Attributes( Hidden ) Private Function IsAnimated() As Boolean
-		  Return Self.Animated And Self.mReady
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Attributes( Hidden ) Private Shared Function Registered() As Boolean
-		  #if DebugBuild
-		    Return True
-		  #else
-		    Return False // Invoice: XXXXXXXXXXXXXXXXXXX
-		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Shared Function Render(Width As Integer, Height As Integer, ScalingFactor As Double, MinorAngle As Double, MajorAngle As Double, ForeColor As Color, BackColor As Color, BorderColor As Color, CancelState As ZirconProgressIndicator.CancelStates) As Picture
-		  If Not ZirconProgressIndicator.Registered Then
-		    Return New Picture(Width, Height)
-		  End If
+		  Var Surface As New Picture(Width * ScalingFactor, Height * ScalingFactor)
+		  Var Radius As Double = Min(Surface.Width, Surface.Height) / 2
+		  Var CenterX As Double = Surface.Width / 2
+		  Var CenterY As Double = Surface.Height / 2
+		  Var Rect As New REALbasic.Rect(Round(CenterX - Radius), Round(CenterY - Radius), Round(Radius * 2), Round(Radius * 2))
+		  Var InsideRect As New REALbasic.Rect(Round(CenterX - (Radius / 2)), Round(CenterY - (Radius / 2)), Round(Radius), Round(Radius))
+		  Var Distance As Double
 		  
-		  Dim Surface As New Picture(Width * ScalingFactor, Height * ScalingFactor)
-		  Dim Radius As Double = Min(Surface.Width, Surface.Height) / 2
-		  Dim CenterX As Double = Surface.Width / 2
-		  Dim CenterY As Double = Surface.Height / 2
-		  Dim Rect As New REALbasic.Rect(Round(CenterX - Radius), Round(CenterY - Radius), Round(Radius * 2), Round(Radius * 2))
-		  Dim InsideRect As New REALbasic.Rect(Round(CenterX - (Radius / 2)), Round(CenterY - (Radius / 2)), Round(Radius), Round(Radius))
-		  Dim Distance As Double
+		  Surface.Graphics.DrawingColor = BackColor
+		  Surface.Graphics.FillRectangle(0, 0, Surface.Width, Surface.Height)
 		  
-		  Surface.Graphics.ForeColor = BackColor
-		  Surface.Graphics.FillRect(0, 0, Surface.Width, Surface.Height)
+		  Surface.Graphics.DrawingColor = ForeColor
 		  
-		  Surface.Graphics.ForeColor = ForeColor
-		  
-		  Dim Angles(0) As Double
+		  Var Angles(0) As Double
 		  Angles(0) = MinorAngle
 		  For Angle As Double = MinorAngle + 45 To MajorAngle - 1 Step 45
-		    Angles.Append(Angle)
+		    #if XojoVersion >= 2020.02
+		      Angles.Add(Angle)
+		    #else
+		      Angles.AddRow(Angle)
+		    #endif
 		  Next
-		  Angles.Append(MajorAngle)
+		  #if XojoVersion >= 2020.02
+		    Angles.Add(MajorAngle)
+		  #else
+		    Angles.AddRow(MajorAngle)
+		  #endif
 		  
 		  Distance = Radius * 1.5
-		  Dim Points(2) As Integer
-		  Points(1) = Round(CenterX)
-		  Points(2) = Round(CenterY)
+		  #if XojoVersion >= 2020.02
+		    Var Path As New GraphicsPath
+		    Path.MoveToPoint(Round(CenterX), Round(CenterY))
+		  #else
+		    Var Points(2) As Integer
+		    Points(1) = Round(CenterX)
+		    Points(2) = Round(CenterY)
+		  #endif
 		  For Each Angle As Double In Angles
 		    While Angle >= 270
 		      Angle = Angle - 360
 		    Wend
-		    Dim Rads As Double = ZirconProgressIndicator.DegreesToRadians(Angle)
-		    Dim LegX As Double = CenterX + (Distance * Cos(Rads))
-		    Dim LegY As Double = CenterY + (Distance * Sin(Rads))
-		    Points.Append(Round(LegX))
-		    Points.Append(Round(LegY))
+		    Var Rads As Double = ZirconProgressIndicator.DegreesToRadians(Angle)
+		    Var LegX As Double = CenterX + (Distance * Cos(Rads))
+		    Var LegY As Double = CenterY + (Distance * Sin(Rads))
+		    #if XojoVersion >= 2020.02
+		      Path.AddLineToPoint(Round(LegX), Round(LegY))
+		    #else
+		      Points.AddRow(Round(LegX))
+		      Points.AddRow(Round(LegY))
+		    #endif
 		  Next
 		  
-		  Surface.Graphics.FillPolygon(Points)
+		  #if XojoVersion >= 2020.02
+		    Surface.Graphics.FillPath(Path)
+		  #else
+		    Surface.Graphics.FillPolygon(Points)
+		  #endif
 		  
-		  Dim Mask As New Picture(Surface.Width, Surface.Height, 32)
-		  Mask.Graphics.DrawPicture(Surface.CopyMask, 0, 0)
-		  Mask.Mask.Graphics.ForeColor = &cFFFFFF
-		  Mask.Mask.Graphics.FillRect(0, 0, Mask.Width, Mask.Height)
-		  Mask.Mask.Graphics.ForeColor = &c000000
-		  Mask.Mask.Graphics.FillOval(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
-		  Mask.Mask.Graphics.ForeColor = &cFFFFFF
-		  Mask.Mask.Graphics.FillOval(InsideRect.Left, InsideRect.Top, InsideRect.Width, InsideRect.Height)
+		  Var ShapeMask As New Picture(Surface.Width, Surface.Height)
+		  ShapeMask.Graphics.DrawingColor = &cFFFFFF
+		  ShapeMask.Graphics.FillRectangle(0, 0, ShapeMask.Width, ShapeMask.Height)
+		  ShapeMask.Graphics.DrawingColor = &c000000
+		  ShapeMask.Graphics.FillOval(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
+		  ShapeMask.Graphics.DrawingColor = &cFFFFFF
+		  ShapeMask.Graphics.FillOval(InsideRect.Left, InsideRect.Top, InsideRect.Width, InsideRect.Height)
 		  
-		  Dim Temp As New Picture(Surface.Width, Surface.Height, 32)
-		  Temp.Graphics.DrawPicture(Mask, 0, 0)
+		  Var ColorMask As Picture = Surface.CopyMask
+		  ColorMask.ApplyMask(ShapeMask)
+		  
+		  Var Temp As New Picture(Surface.Width, Surface.Height)
+		  Temp.Graphics.DrawingColor = &cFFFFFF
+		  Temp.Graphics.FillRectangle(0, 0, Temp.Width, Temp.Height)
+		  Temp.Graphics.DrawPicture(ColorMask, 0, 0)
 		  Surface.ApplyMask(Temp)
 		  
-		  Surface.Graphics.ForeColor = BorderColor
-		  Surface.Graphics.PenWidth = Max(Rect.Width / (37.5 * ScalingFactor), 1) * ScalingFactor
-		  Surface.Graphics.PenHeight = Surface.Graphics.PenWidth
+		  Surface.Graphics.DrawingColor = BorderColor
+		  Surface.Graphics.PenSize = Max(Rect.Width / (37.5 * ScalingFactor), 1) * ScalingFactor
 		  Surface.Graphics.DrawOval(Rect.Left, Rect.Top, Rect.Width, Rect.Height)
-		  Surface.Graphics.DrawOval(InsideRect.Left - Surface.Graphics.PenWidth, InsideRect.Top - Surface.Graphics.PenWidth, InsideRect.Width + (Surface.Graphics.PenWidth * 2), InsideRect.Height + (Surface.Graphics.PenWidth * 2))
+		  Surface.Graphics.DrawOval(InsideRect.Left - Surface.Graphics.PenSize, InsideRect.Top - Surface.Graphics.PenSize, InsideRect.Width + (Surface.Graphics.PenSize * 2), InsideRect.Height + (Surface.Graphics.PenSize * 2))
 		  
 		  If CancelState <> ZirconProgressIndicator.CancelStates.Disabled Then
 		    Distance = Radius / 2.5
-		    Dim LeftEdge As Double = CenterX + (Distance * Cos(3.92699))
-		    Dim TopEdge As Double = CenterY + (Distance * Sin(3.92699))
-		    Dim RightEdge As Double = CenterX + (Distance * Cos(0.785398))
-		    Dim BottomEdge As Double = CenterY + (Distance * Cos(0.785398))
+		    Var LeftEdge As Double = CenterX + (Distance * Cos(3.92699))
+		    Var TopEdge As Double = CenterY + (Distance * Sin(3.92699))
+		    Var RightEdge As Double = CenterX + (Distance * Cos(0.785398))
+		    Var BottomEdge As Double = CenterY + (Distance * Cos(0.785398))
 		    
-		    Dim CancelRect As New REALbasic.Rect(Round(LeftEdge), Round(TopEdge), Round(RightEdge - LeftEdge), Round(BottomEdge - TopEdge))
+		    Var CancelRect As New REALbasic.Rect(Round(LeftEdge), Round(TopEdge), Round(RightEdge - LeftEdge), Round(BottomEdge - TopEdge))
 		    Surface.Graphics.Transparency = 0
 		    If CancelState = ZirconProgressIndicator.CancelStates.Pressed Then
-		      Surface.Graphics.ForeColor = RGB(ForeColor.Red * 0.5, ForeColor.Green * 0.5, ForeColor.Blue * 0.5, ForeColor.Alpha * 0.5)
+		      Surface.Graphics.DrawingColor = RGB(ForeColor.Red * 0.5, ForeColor.Green * 0.5, ForeColor.Blue * 0.5, ForeColor.Alpha * 0.5)
 		    Else
-		      Surface.Graphics.ForeColor = ForeColor
+		      Surface.Graphics.DrawingColor = ForeColor
 		    End If
-		    Surface.Graphics.FillRect(CancelRect.Left, CancelRect.Top, CancelRect.Width, CancelRect.Height)
+		    Surface.Graphics.FillRectangle(CancelRect.Left, CancelRect.Top, CancelRect.Width, CancelRect.Height)
 		  End If
 		  
 		  Surface.HorizontalResolution = 72 * ScalingFactor
@@ -266,35 +276,21 @@ Inherits ArtisanKit.Control
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Attributes( Hidden ) Private Sub SetAngles(MinorAngle As Double, MajorAngle As Double, Ease As Boolean, Animated As Boolean)
+		Private Sub SetAngles(MinorAngle As Double, MajorAngle As Double, Ease As Boolean)
 		  While MinorAngle < Self.mMinorAngle Or MinorAngle < Self.mMajorAngle Or MajorAngle < Self.mMinorAngle Or MajorAngle < Self.mMajorAngle
 		    Self.mMinorAngle = Self.mMinorAngle - 360
 		    Self.mMajorAngle = Self.mMajorAngle - 360
 		  Wend
 		  
-		  If Self.IsAnimated Or Animated Then
-		    Dim Duration As Double = Self.CalculateDuration(Self.mMajorAngle, MajorAngle)
-		    Self.StartAnimation("angle-minor", Self.mMinorAngle, MinorAngle, Duration, Ease)
-		    Self.StartAnimation("angle-major", Self.mMajorAngle, MajorAngle, Duration, Ease)
-		  Else
-		    Self.CancelAnimation("angle-minor")
-		    Self.CancelAnimation("angle-major")
-		    Self.mMinorAngle = MinorAngle
-		    Self.mMajorAngle = MajorAngle
-		    Self.Invalidate
-		  End If
+		  Var Duration As Double = Self.CalculateDuration(Self.mMajorAngle, MajorAngle)
+		  Self.StartAnimation("angle-minor", Self.mMinorAngle, MinorAngle, Duration, Ease)
+		  Self.StartAnimation("angle-major", Self.mMajorAngle, MajorAngle, Duration, Ease)
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function Version() As String
-		  Dim Info As Introspection.TypeInfo = Introspection.GetType(Self)
-		  Dim MyAttributes() As Introspection.AttributeInfo = Info.GetAttributes
-		  For Each Item As Introspection.AttributeInfo In MyAttributes
-		    If Item.Name = "Version" Then
-		      Return Item.Value
-		    End If
-		  Next
+		  Return "1.3"
 		End Function
 	#tag EndMethod
 
@@ -307,10 +303,6 @@ Inherits ArtisanKit.Control
 		Event Open()
 	#tag EndHook
 
-
-	#tag Property, Flags = &h0
-		Animated As Boolean
-	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
@@ -340,12 +332,6 @@ Inherits ArtisanKit.Control
 		#tag Setter
 			Set
 			  If Self.mBackColor = Value Then
-			    Return
-			  End If
-			  
-			  If Not Self.IsAnimated Then
-			    Self.mBackColor = Value
-			    Self.Invalidate
 			    Return
 			  End If
 			  
@@ -434,12 +420,6 @@ Inherits ArtisanKit.Control
 			    Return
 			  End If
 			  
-			  If Not Self.IsAnimated Then
-			    Self.mForeColor = Value
-			    Self.Invalidate
-			    Return
-			  End If
-			  
 			  If Self.mForeColor.Red <> Value.Red Then
 			    Self.StartAnimation("fore-red", Self.mForeColor.Red, Value.Red, Self.AnimationDuration)
 			  End If
@@ -467,14 +447,17 @@ Inherits ArtisanKit.Control
 			Set
 			  If Self.mIndeterminate <> Value Then
 			    Self.mIndeterminate = Value
+			    Var WasAnimated As Boolean = Self.Animated
+			    Self.Animated = True
 			    If Value Then
-			      If Not Self.IsAnimated Then
+			      If Not Self.Animated Then
 			        Self.mMinorAngle = Self.mMajorAngle - 60
 			      End If
-			      Self.SetAngles(-120, -60, False, True)
+			      Self.SetAngles(-120, -60, False)
 			    Else
-			      Self.SetAngles(-90, Self.AngleForProgress(Self.Progress), False, False)
+			      Self.SetAngles(-90, Self.AngleForProgress(Self.Progress), False)
 			    End If
+			    Self.Animated = WasAnimated
 			    Self.Invalidate
 			  End If
 			End Set
@@ -483,19 +466,19 @@ Inherits ArtisanKit.Control
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mAnimatedMaximum As Double
+		Private mAnimatedMaximum As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mAnimatedMinimum As Double
+		Private mAnimatedMinimum As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mAnimatedValue As Double
+		Private mAnimatedValue As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mAutomaticBorderColor As Boolean
+		Private mAutomaticBorderColor As Boolean
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -511,12 +494,7 @@ Inherits ArtisanKit.Control
 			  End If
 			  
 			  Self.mTargetMaximum = Value
-			  If Self.IsAnimated Then
-			    Self.StartAnimation("maximum", Self.mAnimatedMaximum, Value, Self.AnimationDuration)
-			  Else
-			    Self.mAnimatedMaximum = Value
-			    Self.Invalidate
-			  End If
+			  Self.StartAnimation("maximum", Self.mAnimatedMaximum, Value, Self.AnimationDuration)
 			  
 			  If Self.Value > Value Then
 			    Self.Value = Value
@@ -527,31 +505,31 @@ Inherits ArtisanKit.Control
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mBackColor As Color = &cFFFFFFFF
+		Private mBackColor As Color = &cFFFFFFFF
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mBorderColor As Color
+		Private mBorderColor As Color
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mCanCancel As Boolean
+		Private mCanCancel As Boolean
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mCancelPressed As Boolean
+		Private mCancelPressed As Boolean
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mCancelRect As REALbasic.Rect
+		Private mCancelRect As Xojo.Rect
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mForeColor As Color = &c4A91D5
+		Private mForeColor As Color = &c4A91D5
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mIndeterminate As Boolean
+		Private mIndeterminate As Boolean
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -567,12 +545,7 @@ Inherits ArtisanKit.Control
 			  End If
 			  
 			  Self.mTargetMinimum = Value
-			  If Self.IsAnimated Then
-			    Self.StartAnimation("minimum", Self.mAnimatedMinimum, Value, Self.AnimationDuration)
-			  Else
-			    Self.mAnimatedMinimum = Value
-			    Self.Invalidate
-			  End If
+			  Self.StartAnimation("minimum", Self.mAnimatedMinimum, Value, Self.AnimationDuration)
 			  
 			  If Self.Value < Value Then
 			    Self.Value = Value
@@ -583,31 +556,31 @@ Inherits ArtisanKit.Control
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mMajorAngle As Double = -90
+		Private mMajorAngle As Double = -90
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mMinorAngle As Double = -90
+		Private mMinorAngle As Double = -90
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mReady As Boolean
+		Private mReady As Boolean
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mTargetMaximum As Double
+		Private mTargetMaximum As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mTargetMinimum As Double
+		Private mTargetMinimum As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mTransparency As Double
+		Private mTransparency As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Attributes( Hidden ) Private mValue As Double
+		Private mValue As Double
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -633,7 +606,7 @@ Inherits ArtisanKit.Control
 		#tag Setter
 			Set
 			  Self.mValue = Value
-			  Dim Angle As Double = Self.AngleForProgress(Self.Progress)
+			  Var Angle As Double = Self.AngleForProgress(Self.Progress)
 			  If Angle = Self.mMajorAngle Or Self.Indeterminate Then
 			    Return
 			  End If
@@ -642,11 +615,7 @@ Inherits ArtisanKit.Control
 			  While Self.mMajorAngle > 270
 			    Self.mMajorAngle = Self.mMajorAngle - 360
 			  Wend
-			  If Self.IsAnimated Then
-			    Self.StartAnimation("angle-major", Self.mMajorAngle, Angle, Self.CalculateDuration(Self.mMajorAngle, Angle))
-			  Else
-			    Self.mMajorAngle = Angle
-			  End If
+			  Self.StartAnimation("angle-major", Self.mMajorAngle, Angle, Self.CalculateDuration(Self.mMajorAngle, Angle))
 			  Self.Invalidate
 			End Set
 		#tag EndSetter
@@ -654,10 +623,10 @@ Inherits ArtisanKit.Control
 	#tag EndComputedProperty
 
 
-	#tag Constant, Name = AnimationDuration, Type = Double, Dynamic = False, Default = \"0.3", Scope = Private, Attributes = \"Hidden"
+	#tag Constant, Name = AnimationDuration, Type = Double, Dynamic = False, Default = \"0.3", Scope = Private, Attributes = \""
 	#tag EndConstant
 
-	#tag Constant, Name = RevolutionTime, Type = Double, Dynamic = False, Default = \"0.75", Scope = Private, Attributes = \"Hidden"
+	#tag Constant, Name = RevolutionTime, Type = Double, Dynamic = False, Default = \"0.75", Scope = Private, Attributes = \""
 	#tag EndConstant
 
 
@@ -670,25 +639,68 @@ Inherits ArtisanKit.Control
 
 	#tag ViewBehavior
 		#tag ViewProperty
+			Name="AllowAutoDeactivate"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Tooltip"
+			Visible=true
+			Group="Appearance"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AllowFocusRing"
+			Visible=true
+			Group="Appearance"
+			InitialValue="True"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AllowFocus"
+			Visible=true
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="AllowTabs"
+			Visible=true
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Index"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="Integer"
-			EditorType="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
-			EditorType="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
-			EditorType="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Height"
@@ -696,41 +708,55 @@ Inherits ArtisanKit.Control
 			Group="Position"
 			InitialValue="100"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="InitialParent"
+			Visible=false
 			Group="Position"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"
 			Visible=true
 			Group="Position"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="LockBottom"
 			Visible=true
 			Group="Position"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="LockLeft"
 			Visible=true
 			Group="Position"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="LockRight"
 			Visible=true
 			Group="Position"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="LockTop"
 			Visible=true
 			Group="Position"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="TabIndex"
@@ -738,12 +764,15 @@ Inherits ArtisanKit.Control
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="TabPanelIndex"
+			Visible=false
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="TabStop"
@@ -751,12 +780,15 @@ Inherits ArtisanKit.Control
 			Group="Position"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
 			Visible=true
 			Group="Position"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Width"
@@ -764,19 +796,15 @@ Inherits ArtisanKit.Control
 			Group="Position"
 			InitialValue="100"
 			Type="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="AutoDeactivate"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Backdrop"
+			Visible=false
 			Group="Appearance"
+			InitialValue=""
 			Type="Picture"
-			EditorType="Picture"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Enabled"
@@ -784,20 +812,7 @@ Inherits ArtisanKit.Control
 			Group="Appearance"
 			InitialValue="True"
 			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="HelpTag"
-			Visible=true
-			Group="Appearance"
-			Type="String"
-			EditorType="MultiLineEditor"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="UseFocusRing"
-			Visible=true
-			Group="Appearance"
-			InitialValue="True"
-			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Visible"
@@ -805,23 +820,15 @@ Inherits ArtisanKit.Control
 			Group="Appearance"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="NeedsFullKeyboardAccessForFocus"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="AcceptFocus"
-			Visible=true
-			Group="Behavior"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="AcceptTabs"
-			Visible=true
-			Group="Behavior"
-			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Animated"
@@ -829,6 +836,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="BackColor"
@@ -836,6 +844,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="&cFFFFFFFF"
 			Type="Color"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="CanCancel"
@@ -843,17 +852,15 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DoubleBuffer"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="EraseBackground"
-			Group="Behavior"
-			Type="Boolean"
-			EditorType="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="ForeColor"
@@ -861,11 +868,15 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="&c4A91D5"
 			Type="Color"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="HasFocus"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Indeterminate"
@@ -873,6 +884,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="False"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Maximum"
@@ -880,6 +892,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="100"
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Minimum"
@@ -887,17 +900,23 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="0"
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Progress"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="ScrollSpeed"
+			Visible=false
 			Group="Behavior"
 			InitialValue="20"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Transparent"
@@ -905,7 +924,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
-			EditorType="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Value"
@@ -913,6 +932,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="50"
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="AutomaticBorderColor"
@@ -920,6 +940,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="BorderColor"
@@ -927,6 +948,7 @@ Inherits ArtisanKit.Control
 			Group="Behavior"
 			InitialValue="&c000000E4"
 			Type="Color"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
