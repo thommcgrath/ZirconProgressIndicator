@@ -4,7 +4,7 @@ Need a circular progress indicator? Need it animated, with an attached cancel bu
 
 ## Requirements
 
-This control requires [Artisan Kit 1.1.0](https://github.com/thommcgrath/ArtisanKit/releases/), which requires Xojo 2015 Release 1. Only desktop projects are supported.
+This control requires [Artisan Kit 1.2.1](https://github.com/thommcgrath/ArtisanKit/releases/), which requires Xojo 2019 Release 2. Only desktop projects are supported.
 
 ## Installation
 

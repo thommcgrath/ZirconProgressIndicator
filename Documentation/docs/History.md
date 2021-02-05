@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.3.0 - February 5th, 2021
+
+- Updated for Xojo API2 and Artisan Kit 1.2.1.
+- Minimum supported Xojo version is now 2019r2
+
 ## Version 1.2.0 - October 29th, 2018
 
 - Added support for macOS 10.14 dark mode.
