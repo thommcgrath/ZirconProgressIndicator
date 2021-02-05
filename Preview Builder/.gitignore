@@ -1,6 +1,0 @@
-*.xojo_uistate
-Builds - *
-*.debug.app
-*.debug
-*.tar.gz
-TempSaveFile*
